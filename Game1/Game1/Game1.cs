@@ -67,6 +67,18 @@ namespace Game1
         private Vector2 p2eyeOrigin;
         private Vector2 p1eyeOrigin;
 
+        // Scoreboard Variable
+        SpriteFont spartansFont;
+        SpriteFont scoreFont;
+        Vector2 spartanFontPosition;
+        Texture2D scoreboard;
+        Vector2 scoreboardPos;
+        Vector2 michiganFontPosition;
+        Vector2 spartanScorePosition;
+        Vector2 michiganScorePosition;
+        int spartanScore = 0;
+        int michiganScore = 0;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -137,6 +149,21 @@ namespace Game1
             ballPosition.X = graphics.GraphicsDevice.Viewport.Width/2;
             ballPosition.Y = 100;
             ballVelocity.X = 20;
+
+            // Scoreboard
+            spartansFont = Content.Load<SpriteFont>("Spartan");
+            scoreFont = Content.Load<SpriteFont>("spartanScore");
+            scoreboard = Content.Load<Texture2D>("Scoreboard");
+            scoreboardPos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - (scoreboard.Width / 2), 
+                graphics.GraphicsDevice.Viewport.Height / 20); 
+            spartanFontPosition = new Vector2(scoreboardPos.X + 70,
+                scoreboardPos.Y + 27);
+            michiganFontPosition = new Vector2(scoreboardPos.X + 205,
+                scoreboardPos.Y + 27);
+            spartanScorePosition = new Vector2(spartanFontPosition.X,
+                spartanFontPosition.Y + 40);
+            michiganScorePosition = new Vector2(michiganFontPosition.X + 18,
+                michiganFontPosition.Y + 116);
         }
 
         /// <summary>
@@ -374,6 +401,29 @@ namespace Game1
             spriteBatch.Draw(p2Eye, p2EyePosition, null, Color.White, p2EyeRotation, p2eyeOrigin, 1, SpriteEffects.None, 0.05f);
             spriteBatch.Draw(ball, ballPosition, null, Color.White);
             spriteBatch.End();
+
+            // Draw the Scoreboard
+            string teamOneName = "Spartans";
+            Vector2 teamOneNameOrigin = spartansFont.MeasureString(teamOneName) / 2;
+            Color spartanGreen = new Color(24, 59, 69);
+            Color michiganBlue = new Color(0, 39, 76);
+            string teamTwoName = "Bad Guys";
+            Vector2 teamTwoOrigin = spartansFont.MeasureString(teamOneName) / 2;
+            Vector2 spartanScoreOrigin = spartansFont.MeasureString(spartanScore.ToString());
+            Vector2 michiganScoreOrigin = scoreFont.MeasureString(michiganScore.ToString());
+
+            spriteBatch.Begin();
+            spriteBatch.Draw(scoreboard, scoreboardPos, null, Color.White);
+            spriteBatch.DrawString(spartansFont, teamOneName, spartanFontPosition,
+                spartanGreen,0, teamOneNameOrigin, 1.0f, SpriteEffects.None, 0.5f);
+            spriteBatch.DrawString(spartansFont, teamTwoName, michiganFontPosition,
+                michiganBlue, 0, teamTwoOrigin, 1.0f, SpriteEffects.None, 0.5f);
+            spriteBatch.DrawString(scoreFont, spartanScore.ToString(), spartanScorePosition,
+                spartanGreen, 0, spartanScoreOrigin, 1.0f, SpriteEffects.None, 0.5f);
+            spriteBatch.DrawString(scoreFont, michiganScore.ToString(), michiganScorePosition,
+                spartanGreen, 0, michiganScoreOrigin, 1.0f, SpriteEffects.None, 0.5f);
+            spriteBatch.End();
+
 
             base.Draw(gameTime);
         }
