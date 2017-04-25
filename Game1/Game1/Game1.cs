@@ -43,7 +43,8 @@ namespace Game1
 
         Vector2 ballVelocity = new Vector2(0f, 0f);
         Vector2 maxBallVelocity = new Vector2(300f, 500f);
-        double minReboundVelocity = 200;
+        Vector2 maxBallReboundVelocity = new Vector2(190f, 190f);
+        //double minReboundVelocity = 200;
         Vector2 backgroundPosition;
         int sprite1WidthMinusHeight;
         int sprite2WidthMinusHeight;
@@ -54,7 +55,8 @@ namespace Game1
         Vector2 player1Center;
         Vector2 player2Center;
         Vector2 ballCenter;
-        int playerRadius = 50;
+        int player1Radius = 58;
+        int player2Radius = 50;
         KeyboardState oldState;
         int MaxX;
         int MinX;
@@ -177,9 +179,7 @@ namespace Game1
             applyGravity();
             captureInput();
             spritePosition.X += spriteSpeed.X * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            CheckForCollision(true);
             spritePosition.Y += spriteSpeed.Y * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            CheckForCollision(false);
 
             updateBall((float)gameTime.ElapsedGameTime.TotalSeconds);
             p1EyePosition.X = spritePosition1.X + 88;
@@ -251,11 +251,6 @@ namespace Game1
 
 
         }
-        void CheckForCollision(bool x)
-        {
-           
-            
-        }
        
 
         void applyGravity()
@@ -289,13 +284,84 @@ namespace Game1
 
         void playerRebound()
         {
+            // when ball hits player....
+            // distance from ball center to player center is less than the sum of their radii
 
+            ballCenter = new Vector2(ballPosition.X + ball.Width/2, ballPosition.Y + ball.Height / 2);
+            player1Center = new Vector2(spritePosition1.X + player1.Width / 2, spritePosition1.Y + player1.Height);// dimensions are 115 x 84
+            player2Center = new Vector2(spritePosition2.X + player2.Width / 2, spritePosition2.Y + player2.Height);// dimensions are 100 x 50
+
+            if (Vector2.Distance(ballCenter, player2Center) <= (ballRadius + player2Radius) ) // radius = 50
+            {
+                Bounce(ref ballVelocity, ref ballPosition, ref spriteSpeed2, ref spritePosition2, ballCenter, player2Center);
+            }
+            else if (Vector2.Distance(ballCenter, player1Center) <= (ballRadius + player1Radius)) // radius = 84
+            {
+                Bounce(ref ballVelocity, ref ballPosition, ref spriteSpeed1, ref spritePosition1, ballCenter, player1Center);
+            }
+        }
+
+        void Bounce(ref Vector2 ballVelocity, ref Vector2 ballPosition, ref Vector2 spriteVelocity, ref Vector2 spritePosition, Vector2 ballCenter, Vector2 spriteCenter)
+        {
+            double xDist = spriteCenter.X - ballCenter.X;
+            double yDist = spriteCenter.Y - ballCenter.Y;
+            double distSquared = xDist * xDist + yDist * yDist;
+            float xVelocity = ballVelocity.X - spriteVelocity.X;
+            float yVelocity = ballVelocity.Y - spriteVelocity.Y;
+            double dotProduct = xDist * xVelocity + yDist * yVelocity;
+            //Neat vector maths, used for checking if the objects moves towards one another.
+            if (dotProduct > 0)
+            {
+                double collisionScale = dotProduct / distSquared;
+                double xCollision = xDist * collisionScale;
+                double yCollision = yDist * collisionScale;
+                //The Collision vector is the speed difference projected on the Dist vector,
+                //thus it is the component of the speed difference needed for the collision.
+                ballVelocity.X -= (float)(2 * xCollision);
+                ballVelocity.Y -= (float)(2 * yCollision);
+            }
+
+
+
+            // check if velocity is too high
+            if (ballVelocity.X > 0)
+            {
+                if (ballVelocity.X > maxBallReboundVelocity.X)
+                {
+                    ballVelocity.X = maxBallReboundVelocity.X;
+                }
+            }
+            else
+            {
+                if (ballVelocity.X * -1 > maxBallReboundVelocity.X)
+                {
+                    ballVelocity.X = maxBallReboundVelocity.X * -1;
+                }
+            }
+
+            if (ballVelocity.Y > 0)
+            {
+                if (ballVelocity.Y > maxBallReboundVelocity.Y)
+                {
+                    ballVelocity.Y = maxBallReboundVelocity.Y;
+                }
+            }
+            else
+            {
+                if (ballVelocity.Y * -1 > maxBallReboundVelocity.Y)
+                {
+                    ballVelocity.Y = maxBallReboundVelocity.Y * -1;
+                }
+            }
+
+            
         }
 
         void checkForBallCollision(bool x)
         {
             if (x)
             {
+
                 if (MaxX - ballPosition.X < 2 * ballRadius)
                 {
                     ballPosition.X = MaxX - 2 * ballRadius;
@@ -308,7 +374,7 @@ namespace Game1
                     ballVelocity.X *= -1;
                 }
 
-                else if (ballPosition.Y > MaxY - net.Height && ((ballPosition.X + 2 * ballRadius) > netPosition.X && ballPosition.X<netPosition.X+net.Width))
+                else if (ballPosition.Y > MaxY - net.Height && ((ballPosition.X + 2 * ballRadius) > netPosition.X && ballPosition.X<netPosition.X+net.Width)) // ball hit top of net
                 {
                     if (ballVelocity.X < 0)
                     {
@@ -325,7 +391,7 @@ namespace Game1
                 }
                 else
                 {
-                    if (ballPosition.Y > MaxY - ballRadius)
+                    if (ballPosition.Y > MaxY - ballRadius) // ball hit ground
                     {
                         ballPosition.Y = MaxY - ballRadius;
                         ballVelocity.Y *= -1;
@@ -343,9 +409,10 @@ namespace Game1
         {
             
             ballPosition.Y += dt * ballVelocity.Y;
-            checkForBallCollision(false);
+            //checkForBallCollision(false);
             ballPosition.X += dt * ballVelocity.X;
             checkForBallCollision(true);
+            playerRebound();
         }
 
         /// <summary>
