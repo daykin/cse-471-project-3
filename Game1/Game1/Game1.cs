@@ -39,10 +39,10 @@ namespace Game1
         Vector2 ballPosition;
         Texture2D background;
         Rectangle mainFrame;
-        float ballAcceleration= 2.0f;
+        float ballAcceleration= 3.0f;
 
         Vector2 ballVelocity = new Vector2(0f, 0f);
-        Vector2 maxBallVelocity = new Vector2(300f, 500f);
+        Vector2 maxBallVelocity = new Vector2(300f, 450f);
         Vector2 maxBallReboundVelocity = new Vector2(190f, 190f);
         //double minReboundVelocity = 200;
         Vector2 backgroundPosition;
@@ -75,7 +75,7 @@ namespace Game1
         Vector2 spartanFontPosition;
         Texture2D scoreboard;
         Vector2 scoreboardPos;
-        Vector2 michiganFontPosition;
+        Vector2 garbageFontPosition;
         Vector2 spartanScorePosition;
         Vector2 michiganScorePosition;
         int spartanScore = 0;
@@ -160,12 +160,12 @@ namespace Game1
                 graphics.GraphicsDevice.Viewport.Height / 20); 
             spartanFontPosition = new Vector2(scoreboardPos.X + 70,
                 scoreboardPos.Y + 27);
-            michiganFontPosition = new Vector2(scoreboardPos.X + 205,
+            garbageFontPosition = new Vector2(scoreboardPos.X + 205,
                 scoreboardPos.Y + 27);
             spartanScorePosition = new Vector2(spartanFontPosition.X,
                 spartanFontPosition.Y + 40);
-            michiganScorePosition = new Vector2(michiganFontPosition.X + 18,
-                michiganFontPosition.Y + 116);
+            michiganScorePosition = new Vector2(garbageFontPosition.X + 18,
+                garbageFontPosition.Y + 116);
         }
 
         /// <summary>
@@ -240,11 +240,11 @@ namespace Game1
             KeyboardState current = Keyboard.GetState();
             if (current.IsKeyDown(Keys.D) &&current.IsKeyUp(Keys.A) &&spritePosition1.X+player1.Width<netPosition.X)
             {
-                spriteSpeed1.X = 300;
+                spriteSpeed1.X = 350;
             }
             
             else if (current.IsKeyDown(Keys.A) && current.IsKeyUp(Keys.D)&&spritePosition1.X>MinX-16){
-                spriteSpeed1.X = -300;
+                spriteSpeed1.X = -350;
             }
             else
             {
@@ -253,11 +253,11 @@ namespace Game1
 
             if (current.IsKeyDown(Keys.Right) && current.IsKeyUp(Keys.Left)&&spritePosition2.X<MaxX-100)
             {
-                spriteSpeed2.X = 300;
+                spriteSpeed2.X = 350;
             }
 
             else if (current.IsKeyDown(Keys.Left) && current.IsKeyUp(Keys.Right)&&spritePosition2.X>netPosition.X+net.Width){
-                spriteSpeed2.X = -300;
+                spriteSpeed2.X = -350;
             }
             else
             {
@@ -483,7 +483,7 @@ namespace Game1
             spriteBatch.Draw(scoreboard, scoreboardPos, null, Color.White);
             spriteBatch.DrawString(spartansFont, teamOneName, spartanFontPosition,
                 spartanGreen,0, teamOneNameOrigin, 1.0f, SpriteEffects.None, 0.5f);
-            spriteBatch.DrawString(spartansFont, teamTwoName, michiganFontPosition,
+            spriteBatch.DrawString(spartansFont, teamTwoName, garbageFontPosition,
                 michiganBlue, 0, teamTwoOrigin, 1.0f, SpriteEffects.None, 0.5f);
             spriteBatch.DrawString(scoreFont, spartanScore.ToString(), spartanScorePosition,
                 spartanGreen, 0, spartanScoreOrigin, 1.0f, SpriteEffects.None, 0.5f);
