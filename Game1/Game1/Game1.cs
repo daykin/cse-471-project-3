@@ -86,6 +86,9 @@ namespace Game1
         int spartanScore = 0;
         int michiganScore = 0;
 
+        SoundEffect ballHitSoundEffect;
+        SoundEffect jumpSoundEffect;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -179,6 +182,9 @@ namespace Game1
                 spartanFontPosition.Y + 40);
             michiganScorePosition = new Vector2(garbageFontPosition.X + 18,
                 garbageFontPosition.Y + 116);
+
+            ballHitSoundEffect = Content.Load<SoundEffect>("bounce");
+            jumpSoundEffect = Content.Load<SoundEffect>("jump");
         }
 
         /// <summary>
@@ -286,12 +292,14 @@ namespace Game1
             {
                 spritePosition1.Y -= 1;
                 spriteSpeed1.Y = -450;
+                jumpSoundEffect.Play();
             }
 
             if (current.IsKeyDown(Keys.Up) && spritePosition2.Y == graphics.GraphicsDevice.Viewport.Height - player2.Height)
             {
                 spritePosition2.Y -= 1;
                 spriteSpeed2.Y = -450;
+                jumpSoundEffect.Play();
             }
 
 
@@ -399,7 +407,7 @@ namespace Game1
                 }
             }
 
-            
+            ballHitSoundEffect.Play();
         }
 
         void checkForBallCollision(bool x)
@@ -411,12 +419,14 @@ namespace Game1
                 {
                     ballPosition.X = MaxX - 2 * ballRadius;
                     ballVelocity.X *= -1;
+                    ballHitSoundEffect.Play();
                 }
 
                 else if (ballPosition.X < 0)
                 {
                     ballPosition.X = MinX;
                     ballVelocity.X *= -1;
+                    ballHitSoundEffect.Play();
                 }
 
                 else if (ballPosition.Y > MaxY - net.Height && ((ballPosition.X + 2 * ballRadius) > netPosition.X && ballPosition.X<netPosition.X+net.Width)) // ball hit top of net
@@ -425,12 +435,14 @@ namespace Game1
                     {
                         ballVelocity.X *= -1;
                         ballPosition.X = netPosition.X+net.Width+1;// teleport out of collision territory
+                        ballHitSoundEffect.Play();
 
                     }
                     else
                     {
                         ballVelocity.X *= -1;
                         ballPosition.X -= (((ballPosition.X + 30) - netPosition.X)); //teleport out of collision territory
+                        ballHitSoundEffect.Play();
                     }
                     
                 }
@@ -445,6 +457,7 @@ namespace Game1
                     {
                         ballPosition.Y = MaxY - net.Height - 30;
                         ballVelocity.Y *= -1;
+                        ballHitSoundEffect.Play();
                     }
                 }
             }
