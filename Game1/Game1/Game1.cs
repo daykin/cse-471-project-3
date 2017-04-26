@@ -19,6 +19,7 @@ namespace Game1
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        int delay = 100;
         Texture2D player1;
         Texture2D player2;
         Texture2D p1Eye;
@@ -39,11 +40,15 @@ namespace Game1
         Vector2 ballPosition;
         Texture2D background;
         Rectangle mainFrame;
-        float ballAcceleration= 3.0f;
+        float ballAcceleration= 3.5f;
 
+        bool gameWin=false;
+        bool pointWinner = false; //false for p1, true for p2
         Vector2 ballVelocity = new Vector2(0f, 0f);
-        Vector2 maxBallVelocity = new Vector2(300f, 450f);
+        Vector2 maxBallVelocity = new Vector2(250f, 400f);
         Vector2 maxBallReboundVelocity = new Vector2(190f, 190f);
+        Vector2 p1BallStart;
+        Vector2 p2BallStart;
         //double minReboundVelocity = 200;
         Vector2 backgroundPosition;
         int sprite1WidthMinusHeight;
@@ -117,10 +122,6 @@ namespace Game1
             p2Eye = Content.Load<Texture2D>("eyeball2");
             net = Content.Load<Texture2D>("net");
             ball = Content.Load<Texture2D>("ball");
-            sprite1WidthMinusHeight = player1.Width - player1.Height;
-            sprite2WidthMinusHeight = player2.Width - player2.Height;
-            soundEffect = Content.Load<SoundEffect>("chimes");
-            xp = Content.Load<SoundEffect>("xp");
             background = Content.Load<Texture2D>("eb");
 
             MaxX = graphics.GraphicsDevice.Viewport.Width;
@@ -139,6 +140,21 @@ namespace Game1
             spritePosition2.X = graphics.GraphicsDevice.Viewport.Width*3/4 - player2.Width/2;
             spritePosition2.Y = graphics.GraphicsDevice.Viewport.Height - player2.Height;
 
+            p1BallStart.X = spritePosition1.X - 15 + 17 + 50;
+            p1BallStart.Y = 200;
+
+            p2BallStart.X = spritePosition2.X - 15 + 50;
+            p2BallStart.Y = 200;
+
+            if (pointWinner)
+            {
+                ballPosition = p2BallStart;
+            }
+            else
+            {
+                ballPosition = p1BallStart;
+            }
+
             sprite1Height = player1.Bounds.Height;
             sprite1Width = player1.Bounds.Width;
 
@@ -147,10 +163,7 @@ namespace Game1
 
             p1eyeOrigin = new Vector2(p1Eye.Width / 2, p1Eye.Height / 2);
             p2eyeOrigin = new Vector2(p2Eye.Width / 2, p2Eye.Height / 2);
-
-            ballPosition.X = graphics.GraphicsDevice.Viewport.Width/2;
-            ballPosition.Y = 100;
-            ballVelocity.X = 20;
+           
 
             // Scoreboard
             spartansFont = Content.Load<SpriteFont>("Spartan");
@@ -190,10 +203,15 @@ namespace Game1
                 this.Exit();
 
             // Move the sprite around
-
-            UpdateSprite(gameTime, ref spritePosition1, ref spriteSpeed1);
-            UpdateSprite(gameTime, ref spritePosition2, ref spriteSpeed2);
-
+            if (delay == 0)
+            {
+                UpdateSprite(gameTime, ref spritePosition1, ref spriteSpeed1);
+                UpdateSprite(gameTime, ref spritePosition2, ref spriteSpeed2);
+            }
+            else
+            {
+                delay -= 1;
+            }
             base.Update(gameTime);
         }
 
@@ -420,8 +438,8 @@ namespace Game1
                 {
                     if (ballPosition.Y > MaxY - ballRadius) // ball hit ground
                     {
-                        ballPosition.Y = MaxY - ballRadius;
-                        ballVelocity.Y *= -1;
+                        
+                        reset();
                     }
                     else if (ballPosition.Y+30 > MaxY - net.Height && ((ballPosition.X + 2 * ballRadius) > netPosition.X && ballPosition.X < netPosition.X + net.Width))
                     {
@@ -430,6 +448,37 @@ namespace Game1
                     }
                 }
             }
+        }
+
+        void reset()
+        {
+            pointWinner = (ballPosition.X < netPosition.X);
+            delay = 200;
+            ballVelocity.X = 0;
+            ballVelocity.Y = 0;
+            spriteSpeed1.X = 0;
+            spriteSpeed1.Y = 0;
+            spriteSpeed2.X = 0;
+            spriteSpeed2.Y = 0;
+            spritePosition1.X = graphics.GraphicsDevice.Viewport.Width / 4 - player1.Width / 2;
+            spritePosition1.Y = graphics.GraphicsDevice.Viewport.Height - player1.Height;
+            spritePosition2.X = graphics.GraphicsDevice.Viewport.Width * 3 / 4 - player2.Width / 2;
+            spritePosition2.Y = graphics.GraphicsDevice.Viewport.Height - player2.Height;
+            p1EyePosition.X = spritePosition1.X + 88;
+            p1EyePosition.Y = spritePosition1.Y + 54;
+            p2EyePosition.X = spritePosition2.X + 24;
+            p2EyePosition.Y = spritePosition2.Y + 25;
+            if (pointWinner)
+            {
+                michiganScore++;
+                ballPosition = p2BallStart;
+            }
+            else
+            {
+                spartanScore++;
+                ballPosition = p1BallStart;
+            }
+            //LoadContent()
         }
 
         void updateBall(float dt)
