@@ -83,11 +83,13 @@ namespace Game1
         Vector2 garbageFontPosition;
         Vector2 spartanScorePosition;
         Vector2 michiganScorePosition;
-        int spartanScore = 0;
+        int spartanScore = 19;
         int michiganScore = 0;
 
         SoundEffect ballHitSoundEffect;
         SoundEffect jumpSoundEffect;
+        SoundEffect UofM_win;
+        SoundEffect MSU_win;
 
         public Game1()
         {
@@ -185,6 +187,9 @@ namespace Game1
 
             ballHitSoundEffect = Content.Load<SoundEffect>("bounce");
             jumpSoundEffect = Content.Load<SoundEffect>("jump");
+            UofM_win = Content.Load<SoundEffect>("UofM_win");
+            MSU_win = Content.Load<SoundEffect>("MSU_win");
+            
         }
 
         /// <summary>
@@ -481,6 +486,7 @@ namespace Game1
             p1EyePosition.Y = spritePosition1.Y + 54;
             p2EyePosition.X = spritePosition2.X + 24;
             p2EyePosition.Y = spritePosition2.Y + 25;
+
             if (pointWinner)
             {
                 michiganScore++;
@@ -492,6 +498,22 @@ namespace Game1
                 ballPosition = p1BallStart;
             }
             //LoadContent()
+            if (michiganScore == 21 || spartanScore == 21)
+            {
+                if (pointWinner)
+                {
+                    UofM_win.Play();
+                    ballPosition = p2BallStart;
+                    michiganScore = 0;
+                }
+                else
+                {
+                    MSU_win.Play();
+                    ballPosition = p1BallStart;
+                    spartanScore = 0;
+                }
+            }
+
         }
 
         void updateBall(float dt)
@@ -532,26 +554,39 @@ namespace Game1
             spriteBatch.End();
 
             // Draw the Scoreboard
-            string teamOneName = "Spartans";
-            Vector2 teamOneNameOrigin = spartansFont.MeasureString(teamOneName) / 2;
-            Color spartanGreen = new Color(24, 59, 69);
-            Color michiganBlue = new Color(0, 39, 76);
-            string teamTwoName = "Bad Guys";
-            Vector2 teamTwoOrigin = spartansFont.MeasureString(teamOneName) / 2;
-            Vector2 spartanScoreOrigin = spartansFont.MeasureString(spartanScore.ToString());
-            Vector2 michiganScoreOrigin = scoreFont.MeasureString(michiganScore.ToString());
+            if (michiganScore <= 20 && spartanScore <= 20)
+            {
+                string UofM_winner = "Michigan Wins";
+                string MSU_winner = "Michigan State Wins";
 
-            spriteBatch.Begin();
-            spriteBatch.Draw(scoreboard, scoreboardPos, null, Color.White);
-            spriteBatch.DrawString(spartansFont, teamOneName, spartanFontPosition,
-                spartanGreen,0, teamOneNameOrigin, 1.0f, SpriteEffects.None, 0.5f);
-            spriteBatch.DrawString(spartansFont, teamTwoName, garbageFontPosition,
-                michiganBlue, 0, teamTwoOrigin, 1.0f, SpriteEffects.None, 0.5f);
-            spriteBatch.DrawString(scoreFont, spartanScore.ToString(), spartanScorePosition,
-                spartanGreen, 0, spartanScoreOrigin, 1.0f, SpriteEffects.None, 0.5f);
-            spriteBatch.DrawString(scoreFont, michiganScore.ToString(), michiganScorePosition,
-                spartanGreen, 0, michiganScoreOrigin, 1.0f, SpriteEffects.None, 0.5f);
-            spriteBatch.End();
+                string teamOneName = "Spartans";
+                Vector2 teamOneNameOrigin = spartansFont.MeasureString(teamOneName) / 2;
+                Color spartanGreen = new Color(24, 59, 69);
+                Color michiganBlue = new Color(0, 39, 76);
+                string teamTwoName = "Bad Guys";
+                Vector2 teamTwoOrigin = spartansFont.MeasureString(teamOneName) / 2;
+                Vector2 spartanScoreOrigin = spartansFont.MeasureString(spartanScore.ToString());
+                Vector2 michiganScoreOrigin = scoreFont.MeasureString(michiganScore.ToString());
+
+                spriteBatch.Begin();
+                spriteBatch.Draw(scoreboard, scoreboardPos, null, Color.White);
+                spriteBatch.DrawString(spartansFont, teamOneName, spartanFontPosition,
+                    spartanGreen, 0, teamOneNameOrigin, 1.0f, SpriteEffects.None, 0.5f);
+                spriteBatch.DrawString(spartansFont, teamTwoName, garbageFontPosition,
+                    michiganBlue, 0, teamTwoOrigin, 1.0f, SpriteEffects.None, 0.5f);
+                spriteBatch.DrawString(scoreFont, spartanScore.ToString(), spartanScorePosition,
+                    spartanGreen, 0, spartanScoreOrigin, 1.0f, SpriteEffects.None, 0.5f);
+                spriteBatch.DrawString(scoreFont, michiganScore.ToString(), michiganScorePosition,
+                    spartanGreen, 0, michiganScoreOrigin, 1.0f, SpriteEffects.None, 0.5f);
+                spriteBatch.End();
+            }
+            else
+            {
+                if(michiganScore == 21)
+                {
+                    
+                }
+            }
 
 
             base.Draw(gameTime);
