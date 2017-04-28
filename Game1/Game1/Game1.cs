@@ -83,13 +83,16 @@ namespace Game1
         Vector2 garbageFontPosition;
         Vector2 spartanScorePosition;
         Vector2 michiganScorePosition;
-        int spartanScore = 19;
+        int spartanScore = 0;
         int michiganScore = 0;
 
         SoundEffect ballHitSoundEffect;
         SoundEffect jumpSoundEffect;
         SoundEffect UofM_win;
         SoundEffect MSU_win;
+
+        private bool paused = false;
+        private bool pauseKeyDown = false;
 
         public Game1()
         {
@@ -213,17 +216,49 @@ namespace Game1
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            // Move the sprite around
-            if (delay == 0)
+            checkPauseKey(Keyboard.GetState());
+
+            // If the user hasn't paused, Update normally
+            if (!paused)
             {
-                UpdateSprite(gameTime, ref spritePosition1, ref spriteSpeed1);
-                UpdateSprite(gameTime, ref spritePosition2, ref spriteSpeed2);
+                // Move the sprite around
+                if (delay == 0)
+                {
+                    UpdateSprite(gameTime, ref spritePosition1, ref spriteSpeed1);
+                    UpdateSprite(gameTime, ref spritePosition2, ref spriteSpeed2);
+                }
+                else
+                {
+                    delay -= 1;
+                }
+                base.Update(gameTime);
             }
-            else
+           
+        }
+
+        private void BeginPause()
+        {
+            paused = true;
+        }
+
+        private void EndPause()
+        {
+            paused = false;
+        }
+
+        private void checkPauseKey(KeyboardState keyboardState)
+        {
+            bool pauseKeyDownThisFrame = keyboardState.IsKeyDown(Keys.P);
+            // If key was not down before, but is down now, we toggle the
+            // pause setting
+            if (!pauseKeyDown && pauseKeyDownThisFrame)
             {
-                delay -= 1;
+                if (!paused)
+                    BeginPause();
+                else
+                    EndPause();
             }
-            base.Update(gameTime);
+            pauseKeyDown = pauseKeyDownThisFrame;
         }
 
         void UpdateSprite(GameTime gameTime, ref Vector2 spritePosition, ref Vector2 spriteSpeed)
@@ -267,6 +302,7 @@ namespace Game1
         void captureInput()
         {
             KeyboardState current = Keyboard.GetState();
+
             if (current.IsKeyDown(Keys.D) &&current.IsKeyUp(Keys.A) &&spritePosition1.X+player1.Width<netPosition.X)
             {
                 spriteSpeed1.X = 350;
