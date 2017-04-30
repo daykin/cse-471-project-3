@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,12 +85,13 @@ namespace Game1
         Vector2 spartanScorePosition;
         Vector2 michiganScorePosition;
         int spartanScore = 0;
-        int michiganScore = 0;
+        int michiganScore = 20;
 
         SoundEffect ballHitSoundEffect;
         SoundEffect jumpSoundEffect;
         SoundEffect UofM_win;
         SoundEffect MSU_win;
+        int winnerDelay = 0;
 
         private bool paused = false;
         private bool pauseKeyDown = false;
@@ -591,10 +593,7 @@ namespace Game1
             spriteBatch.Draw(ball, ballPosition, null, Color.White);
             spriteBatch.End();
 
-            if (michiganScore == 21 || spartanScore == 21)
-            {
-                displayWinner(gameTime);
-            }
+
 
             // Draw the Scoreboard
             string teamOneName = "Spartans";
@@ -617,7 +616,17 @@ namespace Game1
             spriteBatch.DrawString(scoreFont, michiganScore.ToString(), michiganScorePosition,
                 spartanGreen, 0, michiganScoreOrigin, 1.0f, SpriteEffects.None, 0.5f);
             spriteBatch.End();
-
+            if (michiganScore == 21 || spartanScore == 21)
+            {
+                displayWinner(gameTime);
+                winnerDelay = 200;
+            }
+            else if (winnerDelay > 0)
+            {
+                displayWinner(gameTime);
+                winnerDelay--;
+            }
+            else
                 base.Draw(gameTime);
         }
 
@@ -634,16 +643,16 @@ namespace Game1
 
             if (pointWinner)
             {
-                Vector2 textDimensions = spartansFont.MeasureString(UofM_winner);
+                Vector2 textDimensions = scoreFont.MeasureString(UofM_winner) / 2;
                 spriteBatch.Begin();
-                spriteBatch.DrawString(spartansFont, UofM_winner, winnerPos, spartanGreen, 0, textDimensions, 1.0f, SpriteEffects.None, 0.5f);
+                spriteBatch.DrawString(scoreFont, UofM_winner, winnerPos, michiganBlue, 0, textDimensions, 1.0f, SpriteEffects.None, 0.5f);
                 spriteBatch.End();
             }
             else
             {
-                Vector2 textDimensions = spartansFont.MeasureString(MSU_winner);
+                Vector2 textDimensions = scoreFont.MeasureString(MSU_winner) / 2;
                 spriteBatch.Begin();
-                spriteBatch.DrawString(spartansFont, MSU_winner, winnerPos, michiganBlue, 0, textDimensions, 1.0f, SpriteEffects.None, 0.5f);
+                spriteBatch.DrawString(scoreFont, MSU_winner, winnerPos, spartanGreen, 0, textDimensions, 1.0f, SpriteEffects.None, 0.5f);
                 spriteBatch.End();
             }
 
